@@ -8,14 +8,16 @@ done = False
 
 class Node:
 
-    def __init__(self):
-        self.id = 0
-
+    def __init__(self,parent):
+        self.leaf_id = 0
+        self.left = None
+        self.right = None
+        self.parent = parent
     pass
 
 class MerkleTree:
     def __init__(self):
-        pass
+        self.leaf_id = 0
 
     # on input of 1
     def add_leaf(self,input: str):
@@ -23,6 +25,7 @@ class MerkleTree:
        input : string until newline
        output :
        """
+        self.leaf_id += 1
         pass
 
     # on input of 2
@@ -73,8 +76,14 @@ class MerkleTree:
 
 if __name__ == '__main__':
     global done
-    while not done:
+    tree = None
+    while True:
+        tree = MerkleTree(0)
+        #TODO: finish switch case
+        switch = {0: exit(),1: tree.add_leaf(input = input()),2: tree.calc_root()}
         try:
+            user_input = int(input())
+
             #wrapper loop
             pass
         except KeyboardInterrupt as e:
