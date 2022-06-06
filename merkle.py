@@ -8,9 +8,11 @@ def sha256_from_str(string):
     return (hashlib.sha256((string.encode("utf-8")))).hexdigest()
 
 
+
+
 class Node:
 
-    def __init__(self,data,left=None,right=None):
+    def __init__(self,data=None,left=None,right=None):
         self._left = left
         self._right = right
         self._data = data
@@ -47,39 +49,32 @@ class MerkleTree:
         self._root = Node(None)
         self._values = []
 
+
+
+    def recursive_build(self,values):
+        temp = []
+        if len(values) <= 1:
+            return values[0]
+        while len(values) >= 1:
+            if len(values) == 1:
+                temp.append(Node(data = values[0].data,left = values[0]))
+                values = values[1:]
+            else:
+                temp.append(Node(data = sha256_from_str(values[0].data+values[1].data),left = values[0],right = values[1]))
+                values = values[2:]
+        return self.recursive_build(temp)
+
+    def generate_tree(self):
+        self._root = self.recursive_build(self._values)
+
     # on input of 1
     def add_leaf(self,leaf_data: str):
         """
        input : string until newline
        output :
        """
-        # if current leaf id is even, insert into left
-        if self._leaf_id % 2 == 0:
-            # when working on first level
-            if self._leaf_id >= 2:
-                temp = self._root
-                # create a new root node, with the previous data
-                self._root = Node(temp.data)
-                self._root.left = temp # set the previous root as left node
-                self._root.right = Node(None) # create new root node and set as right node
-                self._root.right.left = Node(data = sha256_from_str(leaf_data)) #insert new value
-                self._root.right.data = self._root.right.left.data # set the value to be the value of the left hash
-                self._root.data = sha256_from_str(self._root.left.data + self._root.right.data) # calculate total root
-            else:
-                # create new node
-                self._root.left = Node(data = sha256_from_str(leaf_data))
-                self._root.data = self._root.left.data
-                self._root.left.parent = self._root
-        # if current leaf id is odd, insert into right
-        else:
-            if self._leaf_id >= 2:
-                pass
-              #??????
-            else:
-                self._root.right = Node(data = sha256_from_str(leaf_data))
-                self._root.data = sha256_from_str(self._root.left.data+self._root.right.data)
-                self._root.right.parent = self._root
-        self._leaf_id += 1
+        self._values.append(Node(data = sha256_from_str(leaf_data)))
+        self.generate_tree()
 
     # on input of 2
     def calc_root(self):
@@ -90,6 +85,7 @@ class MerkleTree:
         if self._root.data is None:
             print("")
             return
+        self.generate_tree()
         print(self._root.data)
 
     # on input of 3
