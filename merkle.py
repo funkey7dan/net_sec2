@@ -12,14 +12,29 @@ def sha256_from_str(string):
 
 class Node:
 
-    def __init__(self,data=None,left=None,right=None):
+    def __init__(self,data=None,left=None,right=None,sibling=None):
+        self._parent = None
         self._left = left
         self._right = right
         self._data = data
+        self._sibling = sibling
 
     @property
     def left(self):
         return self._left
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self,value):
+        self._parent = value
+
+
+    @property
+    def sibling(self):
+        return self._sibling
 
     @property
     def right(self):
@@ -32,6 +47,10 @@ class Node:
     @data.setter
     def data(self,value):
         self._data = value
+
+    @sibling.setter
+    def sibling(self,value):
+        self._sibling = value
 
     @left.setter
     def left(self,value):
@@ -49,8 +68,6 @@ class MerkleTree:
         self._root = Node(None)
         self._values = []
 
-
-
     def recursive_build(self,values):
         temp = []
         if len(values) <= 1:
@@ -60,7 +77,12 @@ class MerkleTree:
                 temp.append(Node(data = values[0].data,left = values[0]))
                 values = values[1:]
             else:
-                temp.append(Node(data = sha256_from_str(values[0].data+values[1].data),left = values[0],right = values[1]))
+                values[0]._sibling = values[1]
+                values[1]._sibling = values[0]
+                temp_node = Node(data = sha256_from_str(values[0].data+values[1].data),left = values[0],right = values[1])
+                values[0]._parent = temp_node
+                values[1]._parent = temp_node
+                temp.append(temp_node)
                 values = values[2:]
         return self.recursive_build(temp)
 
@@ -82,10 +104,15 @@ class MerkleTree:
         input :
         output : root value in hex
         """
+        # try:
+        #     self.generate_tree()
+        # except:
+        #     print("")
+        #     return
         if self._root.data is None:
             print("")
             return
-        self.generate_tree()
+        #self.generate_tree()
         print(self._root.data)
 
     # on input of 3
@@ -94,7 +121,13 @@ class MerkleTree:
         input : X the number of the leaf - leftmost is 0
         output : root{space}hashX{space}...{space}hashY
         """
-        pass
+        proof = self._root.data + " "
+        next = self._values[int(leaf_id)]
+        proof += (next.data+" "+next.sibling.data)
+        while next.parent != self._root:
+            next = next.parent.sibling
+            proof = proof + " " + next.data
+        print(proof)
 
     # on input of 4
     def check_incl_proof(self,leaf_val):
