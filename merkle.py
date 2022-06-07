@@ -1,6 +1,10 @@
 #Ben Eli, 319086435, Daniel Bronfman, 315901173
 # -*- coding: utf-8 -*-
 import hashlib
+
+from cryptography.hazmat.primitives import serialization,hashes
+from cryptography.hazmat.primitives.asymmetric import rsa,padding
+from cryptography.hazmat.backends import default_backend
 import math
 import base64
 
@@ -73,7 +77,10 @@ class MerkleTree:
             return values[0]
         while len(values) >= 1:
             if len(values) == 1:
-                temp.append(Node(data = values[0].data,left = values[0]))
+                temp_node = (Node(data = values[0].data,left = values[0]))
+                values[0]._parent = temp_node
+                temp_node._sibling = temp[-1]
+                temp.append(temp_node)
                 values = values[1:]
             else:
                 values[0]._sibling = values[1]
@@ -106,16 +113,17 @@ class MerkleTree:
         if self._root.data is None:
             print("")
             return
-        #self.generate_tree()
         print(self._root.data)
 
     def generate_helper(self,leaf_id):
         proof = ""
         next_node = self._values[int(leaf_id)]
-        proof += next_node.sibling.data
+        if next_node.sibling is not None:
+            proof += next_node.sibling.data
         while next_node.parent != self._root:
-            next_node = next_node.parent.sibling
-            proof = proof + " " + next_node.data
+            if next_node.parent.sibling is not None:
+                next_node = next_node.parent.sibling
+                proof = proof + " " + next_node.data
         return proof
 
     # on input of 3
@@ -147,6 +155,11 @@ class MerkleTree:
         input: signature key
         output: signature created by passed key
         """
+        message = self._root.data
+        private_key = serialization.load_pem_private_key(sig_key.encode(),password = None,)
+        signature = private_key.sign(message,padding.PSS(mgf = padding.MGF1(hashes.SHA256()),
+                                                         salt_length = padding.PSS.MAX_LENGTH),hashes.SHA256())
+        print((signature).decode())
 
     #on input of 7
     def verify_signature(self,ver_key,sig,to_ver):
@@ -174,8 +187,9 @@ def main(tree):
             user_input = input()
             tree.generate_incl_proof(leaf_id = user_input)
         case 4:
-            user_input = input()
-            tree.check_incl_proof(leaf_val = user_input)
+            user_input1 = input()
+            user_input2 = input()
+            tree.check_incl_proof(leaf_val = user_input1,proof = user_input2)
         case 5:
             tree.generate_rsa_pair()
         case 6:
