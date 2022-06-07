@@ -4,10 +4,9 @@ import hashlib
 import math
 import base64
 
+
 def sha256_from_str(string):
     return (hashlib.sha256((string.encode("utf-8")))).hexdigest()
-
-
 
 
 class Node:
@@ -104,16 +103,20 @@ class MerkleTree:
         input :
         output : root value in hex
         """
-        # try:
-        #     self.generate_tree()
-        # except:
-        #     print("")
-        #     return
         if self._root.data is None:
             print("")
             return
         #self.generate_tree()
         print(self._root.data)
+
+    def generate_helper(self,leaf_id):
+        proof = ""
+        next_node = self._values[int(leaf_id)]
+        proof += next_node.sibling.data
+        while next_node.parent != self._root:
+            next_node = next_node.parent.sibling
+            proof = proof + " " + next_node.data
+        return proof
 
     # on input of 3
     def generate_incl_proof(self,leaf_id):
@@ -121,13 +124,7 @@ class MerkleTree:
         input : X the number of the leaf - leftmost is 0
         output : root{space}hashX{space}...{space}hashY
         """
-        proof = self._root.data + " "
-        next = self._values[int(leaf_id)]
-        proof += (next.data+" "+next.sibling.data)
-        while next.parent != self._root:
-            next = next.parent.sibling
-            proof = proof + " " + next.data
-        print(proof)
+        print(self._root.data + " " + self.generate_helper(leaf_id))
 
     # on input of 4
     def check_incl_proof(self,leaf_val):
