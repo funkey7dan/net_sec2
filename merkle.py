@@ -155,11 +155,14 @@ class MerkleTree:
         input: signature key
         output: signature created by passed key
         """
-        message = self._root.data
+        if self._root == None:
+            print("")
+            return
+        message = self._root.data.encode()
         private_key = serialization.load_pem_private_key(sig_key.encode(),password = None,)
         signature = private_key.sign(message,padding.PSS(mgf = padding.MGF1(hashes.SHA256()),
                                                          salt_length = padding.PSS.MAX_LENGTH),hashes.SHA256())
-        print((signature).decode())
+        print(signature.hex())
 
     #on input of 7
     def verify_signature(self,ver_key,sig,to_ver):
@@ -193,7 +196,9 @@ def main(tree):
         case 5:
             tree.generate_rsa_pair()
         case 6:
-            user_input = input()
+            user_input = input() +"\n"
+            while "-----END RSA PRIVATE KEY-----" not in user_input:
+                user_input += input() + "\n"
             tree.generate_signature(sig_key = user_input)
         case 7:
             user_input1 = input()
