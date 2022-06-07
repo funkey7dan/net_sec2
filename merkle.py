@@ -123,7 +123,7 @@ class MerkleTree:
         """
         proof = self._root.data + " "
         next = self._values[int(leaf_id)]
-        proof += (next.data+" "+next.sibling.data)
+        proof += (next.sibling.data)
         while next.parent != self._root:
             next = next.parent.sibling
             proof = proof + " " + next.data
