@@ -8,14 +8,13 @@ from cryptography.hazmat.backends import default_backend
 import math
 import base64
 
-
+#hash function on a given string
 def sha256_from_str(string):
     return (hashlib.sha256((string.encode("utf-8")))).hexdigest()
 
-
 class Node:
 
-    def __init__(self,data=None,left=None,right=None,sibling=None):
+    def __init__(self,data = None,left = None,right = None,sibling = None):
         self._parent = None
         self._left = left
         self._right = right
@@ -33,7 +32,6 @@ class Node:
     @parent.setter
     def parent(self,value):
         self._parent = value
-
 
     @property
     def sibling(self):
@@ -63,7 +61,6 @@ class Node:
     def right(self,value):
         self._right = value
 
-
 class MerkleTree:
 
     def __init__(self):
@@ -85,7 +82,8 @@ class MerkleTree:
             else:
                 values[0]._sibling = values[1]
                 values[1]._sibling = values[0]
-                temp_node = Node(data = sha256_from_str(values[0].data+values[1].data),left = values[0],right = values[1])
+                temp_node = Node(data = sha256_from_str(values[0].data + values[1].data),left = values[0],
+                                 right = values[1])
                 values[0]._parent = temp_node
                 values[1]._parent = temp_node
                 temp.append(temp_node)
@@ -135,12 +133,21 @@ class MerkleTree:
         print(self._root.data + " " + self.generate_helper(leaf_id))
 
     # on input of 4
-    def check_incl_proof(self,leaf_val):
+    def check_incl_proof(self,leaf_val,proof):
         """
        input : string, the information represented by the leaf
        output : True if the proof is correct False otherwise
        """
-        pass
+        hash_list = proof.split()
+        leaf_hashed_input = sha256_from_str(leaf_val)
+        result = leaf_hashed_input
+        for i in range(1,len(hash_list)):
+            result += hash_list[i]
+            result = sha256_from_str(result)
+        if result == hash_list[0]:
+            print("True")
+            return
+        print("False")
 
     #on input of 5
     def generate_rsa_pair(self):
@@ -148,6 +155,16 @@ class MerkleTree:
         input:
         output: private key and public key
         """
+        private_key = rsa.generate_private_key(public_exponent = 65537,key_size = 2048,backend = default_backend())
+        public_key = private_key.public_key()
+        pem_private = private_key.private_bytes(encoding = serialization.Encoding.PEM,
+                                                format = serialization.PrivateFormat.TraditionalOpenSSL,
+                                                encryption_algorithm = serialization.NoEncryption())
+        pem_public = public_key.public_bytes(encoding = serialization.Encoding.PEM,
+                                             format = serialization.PublicFormat.SubjectPublicKeyInfo)
+
+        print((pem_private).decode())
+        print((pem_public).decode())
 
     #on input of 6
     def generate_signature(self,sig_key):
@@ -172,7 +189,6 @@ class MerkleTree:
         """
 
 def main(tree):
-
     user_choice = None
     user_input = None
     #TODO: finish switch case
