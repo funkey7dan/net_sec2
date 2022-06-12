@@ -8,16 +8,20 @@ from cryptography.hazmat.backends import default_backend
 import math
 import base64
 
+
 # hash function on a given string
 
 
 def sha256_from_str(string):
     return (hashlib.sha256((string.encode("utf-8")))).hexdigest()
 
-def get_key_from_input():
-    user_input = input() + "\n"
+
+def get_key_from_input(inputs):
+    i = 1
+    user_input = ""
     while "-----END" not in user_input:
-        user_input += input() + "\n"
+        user_input += inputs[i] + "\n"
+        i += 1
     return user_input
 
 
@@ -209,7 +213,7 @@ class MerkleTree:
         private_key = serialization.load_pem_private_key(sig_key.encode(), password=None, )
         signature = private_key.sign(message, padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
                                                           salt_length=padding.PSS.MAX_LENGTH), hashes.SHA256())
-       # print(base64.b64decode(signature).decode('ascii'))
+        # print(base64.b64decode(signature).decode('ascii'))
         print(signature.hex())
 
     # on input of 7
@@ -218,11 +222,12 @@ class MerkleTree:
         input: verification key,signature,text to verify
         output: True if signature is correct, False otherwise
         """
-        #ver_key = "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA1MAmLr5TwN8OnQF9OjfWGyGuHfl5056u7XBjYcsidkQHVLkK8NhFzSvBnQbi18PcXVSLusLPVnGs6a9rfN9NkCM6uSom0+lpFgMWuD/7w0HPIW7Cw0hVlFNWvZ8vv5uzA/mzpF8S1fRmCMkfQyP4TDJ2MImQxcdkWDpFDq1pmvRJweavzUnc2eUmuz4bwLYwv3CBKDlCSdIAFCkVP6PJl8cbZkOPqbVPMW+MLf+pZrKfWczCxCnzHmLbzngClQp+4meAtGOGgKKwsmS1eA0BAYfao0g+cu1ESU5ePea/jrX0nJONvDOAeh00keQvxE1xoEnKppbKT2F6RTyBITbCmwIDAQABAoIBAH0iQ5MMyVBRIlRAsvpSKzGsHrBsszZASF1J1HqJs0xiePlhGUlNu8iQqwGEMlp8ThnrB4Ci4rbSh8SvNAavhPx5bCnK3CmaSP/0cyGOKLPQ+laMwiuAWS2z0voXLkuB9copzXqpnPeRF46lVSj1eC7BI3krAKcDv0aRh1q5rrq/T3sH76nENwjxRVig9wZ1jWNBqpWD7LOx2M8INcW4ZbcALbREzKEyydZ1BBx0FXMYyeJRvRdmLzNCb7RZ/wz4B/1bSoUUi8mTBF6xft6fZ6JQNak9r2PEvc7eh+FWoDF3Gu3PBFb0poX7SdWWle9qG6efTSiavUo+cetSQb0qV4kCgYEA+weJpApGEqxKwCe8oN+pd42QOmnKEzqQlZ33pSP97VmOQj6GcXfuonnH/0hu4jozj5N96kOCDjDPdpCOvUgzupJBhiRr1M/4y8f+SoWrRCuHHscnfh5Qpv+iwpSHTcV8ys2fGowpmd9tZfGerJkvAcD/3jG1Mo+0anemHAoCbXUCgYEA2PaTrBVXKJovd9ZjPqWX7MWhTh1NFGCquQPe4cX5h8wIgjSBqozsosKzKYHmK/kw7yU/P9UvCiEbiowPiqDZoSbZ6twpf2bcXjaVKWdRqFD+OvGXEvpPVvdbRUXv0J9UDsd1EDM5/lX6Sja54ibIKP+okcjH3YPd4xbRvZoyHc8CgYARJgGsGBuTWPu+RrinEMBl72DD7MgmKiEIZ4MsX9oP5cdHFThf9f5yUPltoggZIjq1ezDl2PjAeWsiwVtO6OjHvQgG3uQS5KYtXZssghciEAsp+hbjkbSWw+3ddwILOQt+Wy+cQ6jv3wh9J1VcmxZP+1w/VIv5SUHc6BGL5s8lpQKBgQC4zfdlOdw+0m6iZfOtNgHdhU1rqxuvwtNIutpLd4WfvRR2S+Ey88zQqoVPUr1LMXwUB6cDaUQjHaZG8hx+2ZnmYaB3I8cZJPWKLnYJiV8Nvsd+T7B+UsXn7tRIglTOYBiKaiz1epzoXjXOpyTYVG5kNbhRTTOpJJyIxTQsiz4rEwKBgBxxJ6t4F8APkYkXaY5EB/Z6EtJJDbKgoqBkfWuVZ0DzPBmVKUbP6EKMT085EM/HlQer1QQjfkdepVuCL7mdDjKcxVMiuMKPWtVlsJjtJMa11smmdqZ5UT/w6R54/knAIkDXNlGE2xBXCcfKdhF2+lICi5COWEQk5NASSVdgfKjN\n-----END RSA PRIVATE KEY-----"
+        # ver_key = "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEA1MAmLr5TwN8OnQF9OjfWGyGuHfl5056u7XBjYcsidkQHVLkK8NhFzSvBnQbi18PcXVSLusLPVnGs6a9rfN9NkCM6uSom0+lpFgMWuD/7w0HPIW7Cw0hVlFNWvZ8vv5uzA/mzpF8S1fRmCMkfQyP4TDJ2MImQxcdkWDpFDq1pmvRJweavzUnc2eUmuz4bwLYwv3CBKDlCSdIAFCkVP6PJl8cbZkOPqbVPMW+MLf+pZrKfWczCxCnzHmLbzngClQp+4meAtGOGgKKwsmS1eA0BAYfao0g+cu1ESU5ePea/jrX0nJONvDOAeh00keQvxE1xoEnKppbKT2F6RTyBITbCmwIDAQABAoIBAH0iQ5MMyVBRIlRAsvpSKzGsHrBsszZASF1J1HqJs0xiePlhGUlNu8iQqwGEMlp8ThnrB4Ci4rbSh8SvNAavhPx5bCnK3CmaSP/0cyGOKLPQ+laMwiuAWS2z0voXLkuB9copzXqpnPeRF46lVSj1eC7BI3krAKcDv0aRh1q5rrq/T3sH76nENwjxRVig9wZ1jWNBqpWD7LOx2M8INcW4ZbcALbREzKEyydZ1BBx0FXMYyeJRvRdmLzNCb7RZ/wz4B/1bSoUUi8mTBF6xft6fZ6JQNak9r2PEvc7eh+FWoDF3Gu3PBFb0poX7SdWWle9qG6efTSiavUo+cetSQb0qV4kCgYEA+weJpApGEqxKwCe8oN+pd42QOmnKEzqQlZ33pSP97VmOQj6GcXfuonnH/0hu4jozj5N96kOCDjDPdpCOvUgzupJBhiRr1M/4y8f+SoWrRCuHHscnfh5Qpv+iwpSHTcV8ys2fGowpmd9tZfGerJkvAcD/3jG1Mo+0anemHAoCbXUCgYEA2PaTrBVXKJovd9ZjPqWX7MWhTh1NFGCquQPe4cX5h8wIgjSBqozsosKzKYHmK/kw7yU/P9UvCiEbiowPiqDZoSbZ6twpf2bcXjaVKWdRqFD+OvGXEvpPVvdbRUXv0J9UDsd1EDM5/lX6Sja54ibIKP+okcjH3YPd4xbRvZoyHc8CgYARJgGsGBuTWPu+RrinEMBl72DD7MgmKiEIZ4MsX9oP5cdHFThf9f5yUPltoggZIjq1ezDl2PjAeWsiwVtO6OjHvQgG3uQS5KYtXZssghciEAsp+hbjkbSWw+3ddwILOQt+Wy+cQ6jv3wh9J1VcmxZP+1w/VIv5SUHc6BGL5s8lpQKBgQC4zfdlOdw+0m6iZfOtNgHdhU1rqxuvwtNIutpLd4WfvRR2S+Ey88zQqoVPUr1LMXwUB6cDaUQjHaZG8hx+2ZnmYaB3I8cZJPWKLnYJiV8Nvsd+T7B+UsXn7tRIglTOYBiKaiz1epzoXjXOpyTYVG5kNbhRTTOpJJyIxTQsiz4rEwKBgBxxJ6t4F8APkYkXaY5EB/Z6EtJJDbKgoqBkfWuVZ0DzPBmVKUbP6EKMT085EM/HlQer1QQjfkdepVuCL7mdDjKcxVMiuMKPWtVlsJjtJMa11smmdqZ5UT/w6R54/knAIkDXNlGE2xBXCcfKdhF2+lICi5COWEQk5NASSVdgfKjN\n-----END RSA PRIVATE KEY-----"
 
-        #sig = "LhnptHJUc4M0GVZR+wbp5NC6owLwH2+N/UpOKV6jnyH8iA8YoVSQkMU63z8QZyr50L1f4hTWSxZbjzeQ1Rm/1OyAyX9QdQHIrMWRjOx0GPfqPi4wmcmF9ZxPr7ShwRZtbqz9mAekKYDell44Pj21xKsFFy4PgpnxrXFNppPOA3ZpQk245bYPIdzYpcmq0FyYx5RQQCQYBV69QrQOAvvkVVkwZbiqI0/+tZWmfNdV/x6E3PWYljSccMLW/m4nhcy+XQ39Q2oxIzYlobwndW3epxEReLzP7qeN9BR/BVew2yCn4quhm1fA7544mpZaW0VynQDRHBy7gqJDhuWRLjKOcQ=="
-        #to_ver = "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bc"
+        # sig = "LhnptHJUc4M0GVZR+wbp5NC6owLwH2+N/UpOKV6jnyH8iA8YoVSQkMU63z8QZyr50L1f4hTWSxZbjzeQ1Rm/1OyAyX9QdQHIrMWRjOx0GPfqPi4wmcmF9ZxPr7ShwRZtbqz9mAekKYDell44Pj21xKsFFy4PgpnxrXFNppPOA3ZpQk245bYPIdzYpcmq0FyYx5RQQCQYBV69QrQOAvvkVVkwZbiqI0/+tZWmfNdV/x6E3PWYljSccMLW/m4nhcy+XQ39Q2oxIzYlobwndW3epxEReLzP7qeN9BR/BVew2yCn4quhm1fA7544mpZaW0VynQDRHBy7gqJDhuWRLjKOcQ=="
+        # to_ver = "ca978112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bc"
         public_key = serialization.load_pem_public_key(ver_key.encode())
+        sig.replace('\n','')
         return public_key.verify(
             base64.b64encode(sig.encode('ascii')),
             to_ver.encode(),
@@ -239,34 +244,48 @@ def main(tree):
     user_input = None
     # TODO: finish switch case
     user_choice = input()
-    user_choice = int(user_choice)
-    match user_choice:
-        case 0:
-            exit()
-        case 1:
-            user_input = input()
-            tree.add_leaf(leaf_data=user_input)
-        case 2:
-            tree.calc_root()
-        case 3:
-            user_input = input()
-            tree.generate_incl_proof(leaf_id=user_input)
-        case 4:
-            user_input1 = input()
-            user_input2 = input()
-            tree.check_incl_proof(leaf_val=user_input1, proof=user_input2)
-        case 5:
-            tree.generate_rsa_pair()
-        case 6:
-            user_input=get_key_from_input()
-            tree.generate_signature(sig_key=user_input)
-        case 7:
-            user_input1 = get_key_from_input()
-            user_input2 = input()
-            user_input3 = input()
-            tree.verify_signature(ver_key=user_input1, sig=user_input2, to_ver=user_input3)
-        case _:
-            return
+    inputs = user_choice.split()
+    if (len(inputs) > 0):
+
+        match inputs[0]:
+            case '0':
+                exit()
+            case '1':
+                user_input = inputs[1]
+                tree.add_leaf(leaf_data=user_input)
+            case '2':
+                tree.calc_root()
+            case '3':
+                user_input = inputs[1]
+                tree.generate_incl_proof(leaf_id=user_input)
+            case '4':
+                user_input1 = inputs[1]
+                user_input2 = ""
+                for x in range(2, len(inputs)):
+                    user_input2 += inputs[x]
+                    user_input2 += " "
+                tree.check_incl_proof(leaf_val=user_input1, proof=user_input2)
+            case '5':
+                tree.generate_rsa_pair()
+            case '6':
+                user_input = " ".join(inputs[1:])+ "\n"
+                while "-----END" not in user_input:
+                    user_input += input() + "\n"
+                user_input = user_input[0:-1]
+                tree.generate_signature(sig_key=user_input)
+            case '7':
+                user_input1 = " ".join(inputs[1:]) + "\n"
+                while "-----END" not in user_input1:
+                    user_input1 +=input()+ "\n"
+                user_input1=user_input1[0:-1]
+                input()
+                second_input=input()
+                second_input=second_input.split()
+                user_input2 = second_input[0]
+                user_input3 = second_input[1]
+                tree.verify_signature(ver_key=user_input1, sig=user_input2, to_ver=user_input3)
+            case "\n":
+                return
 
 
 if __name__ == '__main__':
