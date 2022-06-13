@@ -90,9 +90,14 @@ class MerkleTree:
         self._values = []
         self.public_key = None
 
-    def recursive_build(self,values):
+    def recursive_build(self,values,recursion_depth=0):
         temp = []
         if len(values) <= 1:
+            if recursion_depth == 0:
+                temp_node = (Node(data = values[0].data,left = values[0]))
+                values[0]._parent = temp_node
+                temp.append(temp_node)
+                self.recursive_build(temp,recursion_depth+1)
             return values[0]
         while len(values) >= 1:
             if len(values) == 1:
@@ -112,7 +117,7 @@ class MerkleTree:
                 values[1]._parent = temp_node
                 temp.append(temp_node)
                 values = values[2:]
-        return self.recursive_build(temp)
+        return self.recursive_build(temp,recursion_depth+1)
 
     def generate_tree(self):
         self._root = self.recursive_build(self._values)
@@ -139,6 +144,7 @@ class MerkleTree:
 
     def generate_helper(self,leaf_id):
         proof = ""
+        if len(self._values)==1: return " "+self._root.data
         next_node = self._values[int(leaf_id)]
         if next_node.sibling is not None:
             if next_node.sibling.is_left and next_node.sibling.is_left is not None:
