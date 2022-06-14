@@ -239,7 +239,6 @@ class MerkleTree:
             print("False")
 
 def main(tree):
-    # TODO: finish switch case
     user_choice = input()
     inputs = user_choice.split()
     if len(inputs) > 0:
