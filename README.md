@@ -1,18 +1,8 @@
 # Merkle Tree + RSA Encryption
-First 4 cases are about Merkle Tree:
+This is a Python implementation of a Merkle Tree and RSA encryption.
 
-1.Adding a new leaf 
+The Merkle Tree implementation includes functions for adding a new leaf to the tree, calculating the root of the tree, providing proof of inclusion for a specific leaf, and checking a given proof of inclusion. The tree is built by recursively concatenating the SHA256 hashes of the left and right nodes and creating a new node with the resulting hash.
 
-2.Calculating the root of the tree 
+The RSA encryption implementation includes functions for generating a RSA key pair (public and private key), creating a special signature using the private key, and verifying the signature using the public key. The RSA encryption uses the cryptography library for the implementation of RSA encryption, and the key pair is serialized to be written to files.
 
-3.Providing proof of inclusion
-
-4.Checking a given proof of inclusion
-
-The last 3 cases are about RSA Encryption:
-
-1.Generating a RSA pair - public key and private key
-
-2.Creating a special signature using the private key
-
-3.Verifying the signautre using the public key.
+The implementation also includes helper functions for hashing strings using SHA256 and for parsing user input to obtain keys.
